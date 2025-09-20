@@ -17,4 +17,6 @@
     }
   },
   "terminal.integrated.defaultProfile.linux": "Micromamba (project)"
+  // Prevent the Python extension from trying its own activation strategy
+  "python.terminal.activateEnvironment": false
 }
