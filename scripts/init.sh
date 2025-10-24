@@ -7,7 +7,7 @@ if [[ "${1-}" == "" ]]; then
 fi
 
 PKG_NAME="$1"
-PY_VER="${2:-3.12}"
+PY_VER="${2:-3.13}"
 DESC="${3:-A Python project.}"
 
 # Rename package folder
@@ -21,7 +21,7 @@ sed -i "s/Project Title/${PKG_NAME}/" README.md
 sed -i "s/from yourpkg/from ${PKG_NAME}/" tests/test_basic.py
 
 # Update Python versions
-sed -i "s/python=3\.12/python=${PY_VER}/" environment.yml
+sed -i "s/python=3\.13/python=${PY_VER}/" environment.yml
 PYVER_SHORT="py$(echo "${PY_VER}" | tr -d '.')"
 sed -i "s/target-version = \"py[0-9]\+\"/target-version = \"${PYVER_SHORT}\"/" pyproject.toml
 sed -i "s/python_version = \"[0-9.]\+\"/python_version = \"${PY_VER}\"/" pyproject.toml
@@ -30,11 +30,10 @@ sed -i "s/python_version = \"[0-9.]\+\"/python_version = \"${PY_VER}\"/" pyproje
 sed -i "s/description = \".*\"/description = \"${DESC}\"/" pyproject.toml
 
 # Create environment
-if command -v micromamba >/dev/null 2>&1; then
-  eval "$(micromamba shell hook -s bash)"
-  micromamba create -y -p ./.venv -f environment.yml
+if command -v uv >/dev/null 2>&1; then
+  UV_PROJECT_ENVIRONMENT=".venv" uv sync --python "${PY_VER}"
 else
-  echo "micromamba not found; please install it and rerun scripts/init.sh"
+  echo "uv not found; please install it and rerun scripts/init.sh"
   exit 2
 fi
 

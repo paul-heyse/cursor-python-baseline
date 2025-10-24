@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # Ensure we're in project env when Codex runs
-eval "$(micromamba shell hook -s bash)"
-micromamba activate -p "${PWD}/.venv"
-# Start Codex with cwd = repo root; let you pass args (e.g., "fix tests")
-exec codex "$@"
+if command -v uv >/dev/null 2>&1; then
+  # Run Codex inside the uv-managed virtual environment
+  UV_PROJECT_ENVIRONMENT=".venv" exec uv run codex "$@"
+else
+  echo "uv not found; please install it and rerun scripts/codex.sh"
+  exit 2
+fi
